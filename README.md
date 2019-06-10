@@ -1,4 +1,12 @@
 # search-frontend
+On a Mac, must be running Node and NPM:
+https://medium.com/@kkostov/how-to-install-node-and-npm-on-macos-using-homebrew-708e2c3877bd
+
+On a Windows system, must install the Linux Subsytem first:
+https://medium.com/@edwardbaeg9/using-homebrew-on-windows-10-with-windows-subsystem-for-linux-wsl-c7f1792f88b3
+
+Once the development Node/NPM environment is setup, install `yarn` globally:
+`brew install yarn`
 
 ## Project setup
 ```

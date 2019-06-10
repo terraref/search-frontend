@@ -41,7 +41,7 @@
     <preview-results></preview-results>
 
     <v-layout fill-height justify-center align-center class="headline grey--text">
-      Submit query for full results...
+      Run Search for full results...
     </v-layout>
   </v-container>
 </template>
