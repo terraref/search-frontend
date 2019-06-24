@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="grey lighten-4">
+  <v-container fluid grid-list-lg fill-height class="grey lighten-4">
     <v-navigation-drawer
       app
       stateless
