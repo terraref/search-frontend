@@ -1,7 +1,8 @@
 <template>
   <v-card class="pa-1">
     <v-card-text>
-      Cultivar Filter
+      <strong>Cultivar Filter</strong>
+      <p>(inputs go here)</p>
     </v-card-text>
   </v-card>
 </template>

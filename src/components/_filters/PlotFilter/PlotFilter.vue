@@ -1,7 +1,8 @@
 <template>
   <v-card class="pa-1">
     <v-card-text>
-      Plots Filter
+      <strong>Plots Filter</strong>
+      <p>(inputs go here)</p>
     </v-card-text>
   </v-card>
 </template>
@@ -12,6 +13,4 @@
   }
 </script>
 
-<style lang="stylus">
-
-</style>
+<style lang="stylus"></style>
