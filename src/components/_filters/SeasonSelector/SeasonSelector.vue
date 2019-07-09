@@ -20,6 +20,7 @@
         single-line
         outline
         class="mb-3"
+        :disabled="disabled"
         @change="handleChange"/>
 
       <v-layout wrap>
@@ -39,7 +40,7 @@
                 hide-details
                 outline
                 readonly
-                :disabled="!season"
+                :disabled="!season || disabled"
                 v-on="on"
               ></v-text-field>
             </template>
@@ -69,7 +70,7 @@
                 hide-details
                 readonly
                 outline
-                :disabled="!season"
+                :disabled="!season || disabled"
                 v-on="on"
               ></v-text-field>
             </template>
@@ -96,6 +97,15 @@
 
     mixins: [valueBind],
 
+    watch: {
+      startDate() {
+        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
+      },
+      endDate() {
+        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
+      }
+    },
+
     created() {
       this.loading = true
 
@@ -108,6 +118,10 @@
           this.loading = false
           console.error(e)
         })
+    },
+
+    props: {
+      disabled: Boolean
     },
 
     data() {
@@ -124,10 +138,10 @@
 
     methods: {
       handleChange(val) {
-        this.mx_value = val
-
         this.startDate = this.seasons.find(s => s.seasonname === val).startdate
         this.endDate = this.seasons.find(s => s.seasonname === val).enddate
+
+        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
       }
     }
   }

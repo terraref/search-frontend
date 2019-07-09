@@ -11,12 +11,27 @@
       style="z-index: 2"
       width="380">
       <form class="query__wrapper pa-3" novalidate>
-        <season-selector @input="handleSeasonSelect" class="mb-3"></season-selector>
+        <div class="selector__wrapper">            
+          <season-selector 
+            :disabled="!!addedFilters.length"
+            @input="handleSeasonSelect"
+            class="mb-3"></season-selector>
+        </div>
 
         <v-divider class="mb-3"></v-divider>
 
         <template v-for="(filter, index) in addedFilters">
-          <component :is="filter" :key="`${filter}-${index}`" class="mb-3"></component>
+          <div class="selector__wrapper mb-3" :key="`${filter}-${index}`">
+            <component :is="filter" :disabled="(addedFilters.length - 1) > index" @input="(val) => { handleFilterChange(val, filter) }"></component>
+            <v-btn
+              icon
+              small
+              color="red"
+              class="elevation-1"
+              @click="handleRemoveFilter(filter)">
+              <v-icon color="white" small>clear</v-icon>
+            </v-btn>
+          </div>
         </template>
 
         <v-layout>
@@ -38,7 +53,11 @@
       </form>
     </v-navigation-drawer>
 
-    <preview-results></preview-results>
+    <preview-results>
+      <template #default>
+        {{ buildQuery }}
+      </template>
+    </preview-results>
 
     <v-layout fill-height justify-center align-center class="headline grey--text">
       Run Search for full results...
@@ -71,7 +90,8 @@
         drawer: true,
         season: '',
         addFilter: '', // v-model for add filter dropdown
-        addedFilters: [] // filters added, used for dynamic components
+        addedFilters: [], // filters added, used for dynamic components
+        filterValues: {}
       }
     },
 
@@ -83,15 +103,42 @@
           { text: 'Treaments', value: 'TreatmentFilter', disabled: this.addedFilters.includes('TreatmentFilter') },
           { text: 'Plots', value: 'PlotFilter', disabled: this.addedFilters.includes('PlotFilter') }
         ]
+      },
+      buildQuery() {
+        const baseUrl = 'https://search-api-dev.workbench.terraref.org/search-api/v1/search?'
+        const values = this.filterValues
+        const params = this.addedFilters.concat('SeasonSelector').map(f => values[f]).join('&')
+
+        return `${baseUrl}${params}`
       }
     },
 
     methods: {
+      handleFilterChange(val, filterName) {
+        this.$set(this.filterValues, filterName, val)
+      },
       handleSeasonSelect(val) {
         this.season = val
+        this.$set(this.filterValues, 'SeasonSelector', val)
       },
       handleClear() {
         this.addedFilters = []
+
+        const {
+          SeasonSelector,
+        } = this.filterValues
+        this.filterValues = { SeasonSelector }
+      },
+      handleRemoveFilter(filter) {
+        const idx = this.addedFilters.findIndex(f => f === filter)
+        this.addedFilters.splice(idx, 1)
+
+        const {
+          [filter]: type,
+          ...rest
+        } = this.filterValues
+
+        this.filterValues = rest
       },
       handleAddFilter(val) {
         // reset dropdown
@@ -100,9 +147,6 @@
         })
 
         this.addedFilters.push(val)
-      },
-      loadComponent(filter) {
-        return import(`@/components/_filters/${filter}/${filter}`)
       }
     }
   }
@@ -115,5 +159,15 @@
 
     .v-input--is-disabled
       opacity: .5
+
+  .selector__wrapper
+    position: relative
+
+    .v-btn
+      position: absolute
+      right: -15px
+      top: -15px
+      width: 20px !important
+      height: 20px !important
 </style>
 

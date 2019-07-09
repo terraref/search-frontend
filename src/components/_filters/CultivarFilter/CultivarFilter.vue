@@ -8,8 +8,16 @@
 </template>
 
 <script>
+  import valueBind from '@/mixins/valueBind'
+  
   export default {
-    name: 'cultivar-filter'
+    name: 'cultivar-filter',
+
+    mixins: [valueBind],
+
+    mounted() {
+      this.mx_value = 'cultivars=Test Parameters'
+    }
   }
 </script>
 

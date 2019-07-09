@@ -8,8 +8,16 @@
 </template>
 
 <script>
+  import valueBind from '@/mixins/valueBind'
+
   export default {
-    name: 'plots-filter'
+    name: 'plots-filter',
+
+    mixins: [valueBind],
+
+    mounted() {
+      this.mx_value = 'observationunits=Test Parameters'
+    }
   }
 </script>
 

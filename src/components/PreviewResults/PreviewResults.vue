@@ -1,5 +1,6 @@
 <template>
   <div class="preview-results grey--text text--lighten-1 pa-3">
+    <div class="preview-results__query"><strong>Query:<slot></slot></strong></div>
     Results Preview
   </div>
 </template>
@@ -20,4 +21,7 @@
     border-radius: 20px
     font-size: 18px
     text-align: center
+
+    .preview-results__query
+      font-size: 14px
 </style>

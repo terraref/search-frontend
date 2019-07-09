@@ -18,6 +18,7 @@
         single-line
         hide-details
         outline
+        :disabled="disabled"
         @change="handleChange"/>
     </v-card-text>
   </v-card>
@@ -27,22 +28,12 @@
   import valueBind from '@/mixins/valueBind'
 
   export default {
-    name: 'season-selector',
+    name: 'product-selector',
 
     mixins: [valueBind],
 
-    created() {
-      // this.loading = true
-
-      // seasons()
-      //   .then(results => {
-      //     this.seasons = results
-      //     this.loading = false
-      //   })
-      //   .catch(e => { 
-      //     this.loading = false
-      //     console.error(e)
-      //   })
+    props: {
+      disabled: Boolean
     },
 
     data() {
@@ -64,7 +55,7 @@
 
     methods: {
       handleChange(val) {
-        this.mx_value = val
+        this.mx_value = `product=${val}`
       }
     }
   }

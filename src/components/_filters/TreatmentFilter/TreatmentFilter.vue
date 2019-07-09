@@ -8,8 +8,16 @@
 </template>
 
 <script>
+  import valueBind from '@/mixins/valueBind'
+  
   export default {
-    name: 'treatment-filter'
+    name: 'treatment-filter',
+
+    mixins: [valueBind],
+
+    mounted() {
+      this.mx_value = 'treatment=Test Parameters'
+    }
   }
 </script>
 
