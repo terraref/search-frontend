@@ -21,7 +21,7 @@
         outline
         class="mb-3"
         :disabled="disabled"
-        @change="handleChange"/>
+        @change="handleSeasonChange"/>
 
       <v-layout wrap>
         <v-flex sm6>
@@ -40,7 +40,7 @@
                 hide-details
                 outline
                 readonly
-                :disabled="!season || disabled"
+                disabled
                 v-on="on"
               ></v-text-field>
             </template>
@@ -70,7 +70,7 @@
                 hide-details
                 readonly
                 outline
-                :disabled="!season || disabled"
+                disabled
                 v-on="on"
               ></v-text-field>
             </template>
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-  import { seasons } from '@/api/'
+  import { seasons } from '@/api'
   import valueBind from '@/mixins/valueBind'
 
   export default {
@@ -99,10 +99,10 @@
 
     watch: {
       startDate() {
-        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
+        this.emitQuery()
       },
       endDate() {
-        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
+        this.emitQuery()
       }
     },
 
@@ -137,11 +137,17 @@
     },
 
     methods: {
-      handleChange(val) {
+      handleSeasonChange(val) {
         this.startDate = this.seasons.find(s => s.seasonname === val).startdate
         this.endDate = this.seasons.find(s => s.seasonname === val).enddate
 
-        this.mx_value = `start=${this.startDate}&end=${this.endDate}`
+        this.emitQuery()
+      },
+      emitQuery() {
+        const season = this.season.split(' ')[1]
+
+        // this emits 'input' event, see valueBind mixin
+        this.mx_value = `season=${season}&start_date=${this.startDate}&end_date=${this.endDate}`
       }
     }
   }
