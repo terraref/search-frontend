@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-1">
-    <v-card-text>
+    <v-card-text :style="{ opacity: disabled ? 0.4 : 1 }">
       <strong>Cultivar Filter</strong>
       <p>(inputs go here)</p>
     </v-card-text>
@@ -14,6 +14,10 @@
     name: 'cultivar-filter',
 
     mixins: [valueBind],
+
+    props: {
+      disabled: Boolean
+    },
 
     mounted() {
       this.mx_value = 'cultivars=Test Parameters'
