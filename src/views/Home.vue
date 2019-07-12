@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-lg fill-height class="grey lighten-4">
+  <v-container fluid grid-list-md fill-height class="grey lighten-4">
     <v-navigation-drawer
       app
       stateless
@@ -26,7 +26,7 @@
             <v-btn
               icon
               small
-              color="red"
+              color="grey"
               class="elevation-1"
               @click="handleRemoveFilter(filter)">
               <v-icon color="white" small>clear</v-icon>
@@ -41,26 +41,65 @@
               single-line
               outline
               append-icon="add"
-              label="Add Filter"
+              label="Add Parameter"
               :items="filters"
               :disabled="!season"
               @change="handleAddFilter"/>
           </v-flex>
         </v-layout>
 
-        <v-btn block flat @click="handleClear">Clear Filters</v-btn>
-        <v-btn block color="green" dark large>Run Search</v-btn>
+        <v-btn block flat @click="handleClear">Clear Parameters</v-btn>
+        <v-btn 
+          block
+          color="green"
+          dark
+          large
+          :loading="loadingSearch"
+          @click="handleSearch">Run Search</v-btn>
       </form>
     </v-navigation-drawer>
 
-    <preview-results>
-      <template #default>
-        {{ buildQuery }}
-      </template>
-    </preview-results>
+    <v-layout column>
+       <v-flex shrink class="preview-query text-xs-center mb-3">
+         <v-card>
+           <v-card-title class="grey--text darken-3">
+             <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParams }}
+           </v-card-title>
+         </v-card>
+      </v-flex>
 
-    <v-layout fill-height justify-center align-center class="headline grey--text">
-      Run Search for full results...
+      <v-flex grow v-if="filteredResults && !loadingSearch">
+        <standard-results-table
+          v-for="(val, key) in filteredResults"
+          :key="key"
+          :title="key.toUpperCase()"
+          :results="val"/>
+      </v-flex>
+
+      <v-layout 
+        v-else
+        fill-height
+        justify-center
+        align-center
+        class="headline grey--text">
+
+        <v-progress-circular
+          v-if="loadingSearch"
+          indeterminate
+          size="70"
+          color="primary">
+        </v-progress-circular>
+
+        <v-layout 
+          v-else-if="response && !filteredResults" 
+          align-items
+          justify-center>
+          <v-icon class="mr-3" large>error_outline</v-icon> Sorry, that query returned an empty data set
+        </v-layout>
+
+        <div v-else>Run Search for full results...</div>
+        <!-- TODO: empty results -->
+      </v-layout>
     </v-layout>
   </v-container>
 </template>
@@ -71,7 +110,11 @@
   import CultivarFilter from '@/components/_filters/CultivarFilter/CultivarFilter'
   import TreatmentFilter from '@/components/_filters/TreatmentFilter/TreatmentFilter'
   import PlotFilter from '@/components/_filters/PlotFilter/PlotFilter'
-  import PreviewResults from '@/components/PreviewResults/PreviewResults'
+  import StandardResultsTable from '@/components/StandardResultsTable/StandardResultsTable'
+
+  import { mainSearch } from '@/api'
+
+  import isEmpty from 'lodash.isempty'
 
   export default {
     name: 'home',
@@ -79,10 +122,10 @@
     components: {
       CultivarFilter,
       PlotFilter,
-      PreviewResults,
       ProductSelector,
       SeasonSelector,
-      TreatmentFilter
+      TreatmentFilter,
+      StandardResultsTable
     },
 
     data() {
@@ -91,7 +134,9 @@
         season: '',
         addFilter: '', // v-model for add filter dropdown
         addedFilters: [], // filters added, used for dynamic components
-        filterValues: {}
+        filterValues: {},
+        response: '',
+        loadingSearch: false
       }
     },
 
@@ -104,12 +149,22 @@
           { text: 'Plots', value: 'PlotFilter', disabled: this.addedFilters.includes('PlotFilter') }
         ]
       },
-      buildQuery() {
-        const baseUrl = 'https://search-api-dev.workbench.terraref.org/search-api/v1/search?'
+      getParams() {
         const values = this.filterValues
         const params = this.addedFilters.concat('SeasonSelector').map(f => values[f]).join('&')
 
-        return `${baseUrl}${params}`
+        return params
+      },
+      filteredResults() {
+        const results = {}
+
+        for(const key in this.response) {
+          if (this.response[key].length) {
+            results[key] = this.response[key]
+          }
+        }
+
+        return !isEmpty(results) ? results : ''
       }
     },
 
@@ -147,6 +202,17 @@
         })
 
         this.addedFilters.push(val)
+      },
+      async handleSearch() {
+        try {
+          this.loadingSearch = true
+          const response = await mainSearch(this.getParams)
+          this.response = response
+        } catch (e) {
+          console.error(e)
+        } finally {
+          this.loadingSearch = false
+        }
       }
     }
   }

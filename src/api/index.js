@@ -12,3 +12,14 @@ export const seasons = () => {
       return data
     })
 }
+
+export const mainSearch = (params) => {
+  return axios.get(`${BASE_URL}/search?${params}`)
+  .then((results) => {
+    const {
+      data = []
+    } = results
+
+    return data
+  })
+}
