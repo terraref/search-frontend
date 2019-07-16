@@ -91,7 +91,7 @@
         </v-progress-circular>
 
         <v-layout 
-          v-else-if="response && !filteredResults" 
+          v-else-if="(response && !filteredResults) || error" 
           align-items
           justify-center>
           <v-icon class="mr-3" large>error_outline</v-icon> Sorry, that query returned an empty data set
@@ -130,6 +130,7 @@
 
     data() {
       return {
+        error: false,
         drawer: true,
         season: '',
         addFilter: '', // v-model for add filter dropdown
@@ -205,10 +206,12 @@
       },
       async handleSearch() {
         try {
+          this.error = false
           this.loadingSearch = true
           const response = await mainSearch(this.getParams)
           this.response = response
         } catch (e) {
+          this.error = true
           console.error(e)
         } finally {
           this.loadingSearch = false
