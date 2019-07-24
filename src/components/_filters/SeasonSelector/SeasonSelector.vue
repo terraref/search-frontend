@@ -5,6 +5,7 @@
     </v-card-title> -->
 
     <v-card-text>
+      <h3 class="mb-1">Seasons:</h3>
       <v-progress-circular
         indeterminate
         class="ma-3"

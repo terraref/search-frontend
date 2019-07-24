@@ -1,13 +1,10 @@
 <template>
   <v-card class="pa-1">
-    <!-- <v-card-title primary-title>
-      <h2>Please select product:</h2>
-    </v-card-title> -->
-
     <v-card-text>
+      <h3 class="mb-1">Products:</h3>
       <v-progress-circular
         indeterminate
-        class="ma-3"
+        class="ma-0"
         color="primary"
         v-if="loading"/>
       <v-select 
@@ -25,12 +22,33 @@
 </template>
 
 <script>
+  import { products } from '@/api'
   import valueBind from '@/mixins/valueBind'
+
+  import uniq from 'lodash.uniq'
 
   export default {
     name: 'product-selector',
 
     mixins: [valueBind],
+
+    mounted() {
+      this.loading = true
+
+      products()
+        .then(results => {
+          this.products = (uniq(results.sort()))
+          this.product = this.products[0]
+
+          this.handleChange(this.product)
+
+          this.loading = false
+        })
+        .catch(e => { 
+          this.loading = false
+          console.error(e)
+        })
+    },
 
     props: {
       disabled: Boolean
@@ -39,16 +57,7 @@
     data() {
       return {
         loading: false,
-        products: [
-          'RGB GeoTIFFs',
-          'Thermal IR GeoTIFFs',
-          'Laser Scanner 3D LAS',
-          'Full Field RGB images',
-          'Full Field IR images',
-          'Canopy Cover',
-          'Mean Temperature',
-          'Canopy Height'
-        ],
+        products: [],
         product: ''
       }
     },

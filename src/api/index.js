@@ -13,6 +13,28 @@ export const seasons = () => {
     })
 }
 
+export const products = () => {
+  return axios.get(`${BASE_URL}/products`)
+    .then((results) => {
+      const {
+        data = []
+      } = results
+
+      return data
+    })
+}
+
+export const cultivars = (params) => {
+  return axios.get(`${BASE_URL}/cultivars?${params}`)
+    .then((results) => {
+      const {
+        data = []
+      } = results
+
+      return data
+    })
+}
+
 export const mainSearch = (params) => {
   return axios.get(`${BASE_URL}/search?${params}`)
   .then((results) => {

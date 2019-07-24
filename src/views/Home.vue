@@ -22,7 +22,12 @@
 
         <template v-for="(filter, index) in addedFilters">
           <div class="selector__wrapper mb-3" :key="`${filter}-${index}`">
-            <component :is="filter" :disabled="(addedFilters.length - 1) > index" @input="(val) => { handleFilterChange(val, filter) }"></component>
+            <component 
+              :is="filter"
+              :params="getParams"
+              :disabled="(addedFilters.length - 1) > index" 
+              @input="(val) => { handleFilterChange(val, filter) }">
+            </component>
             <v-btn
               icon
               small
@@ -68,7 +73,7 @@
          </v-card>
       </v-flex>
 
-      <v-flex grow v-if="filteredResults && !loadingSearch">
+      <v-flex grow v-if="filteredResults && !loadingSearch && !error">
         <standard-results-table
           v-for="(val, key) in filteredResults"
           :key="key"
@@ -146,8 +151,8 @@
         return [
           { text: 'Products', value: 'ProductSelector', disabled: this.addedFilters.includes('ProductSelector') },
           { text: 'Cultivars', value: 'CultivarFilter', disabled: this.addedFilters.includes('CultivarFilter') },
-          { text: 'Treaments', value: 'TreatmentFilter', disabled: this.addedFilters.includes('TreatmentFilter') },
-          { text: 'Plots', value: 'PlotFilter', disabled: this.addedFilters.includes('PlotFilter') }
+          // { text: 'Treaments', value: 'TreatmentFilter', disabled: this.addedFilters.includes('TreatmentFilter') },
+          // { text: 'Plots', value: 'PlotFilter', disabled: this.addedFilters.includes('PlotFilter') }
         ]
       },
       getParams() {
