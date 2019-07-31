@@ -41,7 +41,7 @@
                 hide-details
                 outline
                 readonly
-                disabled
+                :disabled="!season || disabled"
                 v-on="on"
               ></v-text-field>
             </template>
@@ -71,7 +71,7 @@
                 hide-details
                 readonly
                 outline
-                disabled
+                :disabled="!season || disabled"
                 v-on="on"
               ></v-text-field>
             </template>
