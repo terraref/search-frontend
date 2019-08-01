@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid grid-list-md fill-height class="grey lighten-4">
+  <v-container fluid grid-list-md fill-height class="white">
     <v-navigation-drawer
       app
       stateless
@@ -58,7 +58,7 @@
         <v-btn block flat @click="handleClear">Clear Parameters</v-btn>
         <v-btn 
           block
-          color="green"
+          color="secondary"
           dark
           large
           :loading="loadingSearch"
@@ -69,7 +69,7 @@
     <v-layout column>
        <v-flex shrink class="preview-query text-xs-center mb-3">
          <v-card>
-           <v-card-title class="grey--text darken-3">
+           <v-card-title>
              <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParamsAsString }}
            </v-card-title>
          </v-card>
