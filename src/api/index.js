@@ -13,8 +13,8 @@ export const seasons = () => {
     })
 }
 
-export const products = () => {
-  return axios.get(`${BASE_URL}/products`)
+export const products = (params) => {
+  return axios.get(`${BASE_URL}/products?${params}`)
     .then((results) => {
       const {
         data = []

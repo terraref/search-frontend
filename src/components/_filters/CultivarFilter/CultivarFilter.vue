@@ -11,36 +11,45 @@
         v-else
         label="Please select cultivar"
         :items="cultivars"
-        v-model="cultivar"
+        v-model="germplasmName"
         single-line
         hide-details
         outline
-        :disabled="disabled"
-        @change="handleChange"/>
+        :disabled="disabled"/>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
   import { cultivars } from '@/api'
-  import valueBind from '@/mixins/valueBind'
+  import paramsSync from '@/mixins/paramsSync'
 
   import uniq from 'lodash.uniq'
 
   export default {
     name: 'cultivar-selector',
 
-    mixins: [valueBind],
+    mixins: [paramsSync],
+
+    watch: {
+      germplasmName(val) {
+        this.$emit('update:params-sync', {
+          germplasmName: val
+        })
+      }
+    },
 
     mounted() {
       this.loading = true
 
-      cultivars(this.params)
+      cultivars(this.query)
         .then(results => {
           this.cultivars = (uniq(results.sort()))
-          this.cultivar = this.cultivars[0]
-
-          this.handleChange(this.cultivar)
+          
+          // set a default if value isn't already set
+          if (!this.germplasmName) {
+            this.germplasmName = this.cultivars[0]
+          }
 
           this.loading = false
         })
@@ -52,20 +61,14 @@
 
     props: {
       disabled: Boolean,
-      params: String
+      query: String
     },
 
     data() {
       return {
         loading: false,
         cultivars: [],
-        cultivar: ''
-      }
-    },
-
-    methods: {
-      handleChange(val) {
-        this.mx_value = `germplasmName=${val}`
+        germplasmName: ''
       }
     }
   }

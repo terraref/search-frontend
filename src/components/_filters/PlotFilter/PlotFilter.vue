@@ -8,6 +8,7 @@
 </template>
 
 <script>
+  // TODO: need to be refactor to meet requirements for "param syncing"
   import valueBind from '@/mixins/valueBind'
 
   export default {
@@ -20,7 +21,9 @@
     },
 
     mounted() {
-      this.mx_value = 'observationunits=Test Parameters'
+      this.mx_value = {
+        observationunits: 'Test Parameters'
+      }
     }
   }
 </script>

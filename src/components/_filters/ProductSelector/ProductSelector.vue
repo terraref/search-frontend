@@ -15,32 +15,41 @@
         single-line
         hide-details
         outline
-        :disabled="disabled"
-        @change="handleChange"/>
+        :disabled="disabled"/>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
   import { products } from '@/api'
-  import valueBind from '@/mixins/valueBind'
+  import paramsSync from '@/mixins/paramsSync'
 
   import uniq from 'lodash.uniq'
 
   export default {
     name: 'product-selector',
 
-    mixins: [valueBind],
+    mixins: [paramsSync],
+
+    watch: {
+      product(val) {
+        this.$emit('update:params-sync', {
+          product: val
+        })
+      }
+    },
 
     mounted() {
       this.loading = true
 
-      products()
+      products(this.query)
         .then(results => {
           this.products = (uniq(results.sort()))
-          this.product = this.products[0]
 
-          this.handleChange(this.product)
+          // set a default if value isn't already set
+          if (!this.product) {
+            this.product = this.products[0]
+          }
 
           this.loading = false
         })
@@ -51,7 +60,8 @@
     },
 
     props: {
-      disabled: Boolean
+      disabled: Boolean,
+      query: String
     },
 
     data() {
@@ -59,12 +69,6 @@
         loading: false,
         products: [],
         product: ''
-      }
-    },
-
-    methods: {
-      handleChange(val) {
-        this.mx_value = `product=${val}`
       }
     }
   }

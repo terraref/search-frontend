@@ -13,27 +13,29 @@
       <form class="query__wrapper pa-3" novalidate>
         <div class="selector__wrapper">            
           <season-selector 
-            :disabled="!!addedFilters.length"
-            @input="handleSeasonSelect"
+            :disabled="!!addedParameters.length"
+            :params-sync="getParameterParams('SeasonSelector')"
+            @update:params-sync="(val) => { handleParameterChange(val, 'SeasonSelector') }"
             class="mb-3"></season-selector>
         </div>
 
         <v-divider class="mb-3"></v-divider>
 
-        <template v-for="(filter, index) in addedFilters">
-          <div class="selector__wrapper mb-3" :key="`${filter}-${index}`">
+        <template v-for="(parameterName, index) in addedParameters">
+          <div class="selector__wrapper mb-3" :key="`${parameterName}-${index}`">
             <component 
-              :is="filter"
-              :params="getParams"
-              :disabled="(addedFilters.length - 1) > index" 
-              @input="(val) => { handleFilterChange(val, filter) }">
+              :is="parameterName"
+              :query="getParamsAsString"
+              :disabled="(addedParameters.length - 1) > index"
+              :params-sync="getParameterParams(parameterName)"
+              @update:params-sync="(val) => { handleParameterChange(val, parameterName) }">
             </component>
             <v-btn
               icon
               small
               color="grey"
               class="elevation-1"
-              @click="handleRemoveFilter(filter)">
+              @click="handleRemoveParameter(parameterName)">
               <v-icon color="white" small>clear</v-icon>
             </v-btn>
           </div>
@@ -42,14 +44,14 @@
         <v-layout>
           <v-flex xs6 offset-xs6 align-end>
             <v-select
-              v-model="addFilter"
+              v-model="addParameter"
               single-line
               outline
               append-icon="add"
               label="Add Parameter"
-              :items="filters"
-              :disabled="!season"
-              @change="handleAddFilter"/>
+              :items="parameterList"
+              :disabled="!showParameterList"
+              @change="handleAddParameter"/>
           </v-flex>
         </v-layout>
 
@@ -68,7 +70,7 @@
        <v-flex shrink class="preview-query text-xs-center mb-3">
          <v-card>
            <v-card-title class="grey--text darken-3">
-             <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParams }}
+             <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParamsAsString }}
            </v-card-title>
          </v-card>
       </v-flex>
@@ -103,7 +105,6 @@
         </v-layout>
 
         <div v-else>Run Search for full results...</div>
-        <!-- TODO: empty results -->
       </v-layout>
     </v-layout>
   </v-container>
@@ -119,10 +120,44 @@
 
   import { mainSearch } from '@/api'
 
+  import qs from 'qs'
+  import omitBy from 'lodash.omitby'
   import isEmpty from 'lodash.isempty'
+  import reduce from 'lodash.reduce'
+  import uniq from 'lodash.uniq'
 
   export default {
     name: 'home',
+
+    mounted() {
+      const {
+        query = {}
+      } = this.$route
+
+      let paramsToAdd = []
+
+      if (!isEmpty(query)) {
+        for (const name in this.parameters) {
+          for (const key in query) {
+            if (this.parameters[name].params.hasOwnProperty(key)) {
+              this.$set(this.parameters[name].params, key, query[key])
+
+              paramsToAdd.push(name)
+            }
+          }
+        }
+
+        uniq(paramsToAdd).forEach(p => {
+          this.handleAddParameter(p)
+        })
+
+        if (query.initialize == 1) {
+          this.$nextTick(() => {
+            this.handleSearch()
+          })
+        }
+      }
+    },
 
     components: {
       CultivarFilter,
@@ -133,33 +168,107 @@
       StandardResultsTable
     },
 
+    watch: {
+      // write the params as a query string to browser URL
+      getParams(val) {
+        const params = this.addedParameters.length
+          ? {
+            ...val,
+            initialize: 1
+          }
+          : { ...val }
+
+        this.$router.replace({ query: params })
+      }
+    },
+
     data() {
       return {
         error: false,
         drawer: true,
-        season: '',
-        addFilter: '', // v-model for add filter dropdown
-        addedFilters: [], // filters added, used for dynamic components
-        filterValues: {},
+        addParameter: '', // v-model for add parameter menu
+        addedParameters: [], // parameters added, used for dynamic <component>
+        // manifest of available parameters and their properties and params
+        parameters: {
+          SeasonSelector: {
+            text: 'Seasons',
+            value: 'SeasonSelector', // component
+            disabledPredicate: () => {
+              return false
+            },
+            disabled: false,
+            params: {
+              season: '',
+              start_date: '',
+              end_date: ''
+            }
+          },
+          ProductSelector: {
+            text: 'Products',
+            value: 'ProductSelector',
+            disabledPredicate: () => {
+              return this.addedParameters.includes('ProductSelector')
+            },
+            disabled: false,
+            params: {
+              product: ''
+            }
+          },
+          CultivarFilter: {
+            text: 'Cultivars',
+            value: 'CultivarFilter',
+            disabledPredicate: () => {
+              return this.addedParameters.includes('CultivarFilter')
+            },
+            disabled: false,
+            params: {
+              germplasmName: ''
+            }
+          }
+        },
         response: '',
         loadingSearch: false
       }
     },
 
     computed: {
-      filters() {
-        return [
-          { text: 'Products', value: 'ProductSelector', disabled: this.addedFilters.includes('ProductSelector') },
-          { text: 'Cultivars', value: 'CultivarFilter', disabled: this.addedFilters.includes('CultivarFilter') },
-          // { text: 'Treaments', value: 'TreatmentFilter', disabled: this.addedFilters.includes('TreatmentFilter') },
-          // { text: 'Plots', value: 'PlotFilter', disabled: this.addedFilters.includes('PlotFilter') }
-        ]
+      /**
+       * Return this.parameter list without SeasonSelector
+       * and invoke the disabledPredicate and assign value to disabled
+       * disabled value is used for Parameter menu
+       */
+      parameterList() {
+        return reduce(this.parameters, (result, value, key) => {
+          if (key === 'SeasonSelector') return result
+
+          value.disabled = value.disabledPredicate()
+
+          return result.concat(value)
+        }, [])
       },
       getParams() {
-        const values = this.filterValues
-        const params = this.addedFilters.concat('SeasonSelector').map(f => values[f]).join('&')
+        /**
+         * Loops through this.parameters and extracts this.parameter[name].params
+         * omits any empty values and stringifies it with qs library
+         */
+        let params = Object.values(this.parameters)
+          .reduce((o, v) => {
+            const omitEmptyParams = omitBy(v.params, v => v == '')
+            return {
+              ...o, ...omitEmptyParams
+            }
+          }, {})
 
         return params
+      },
+      getParamsAsString() {
+        return qs.stringify(this.getParams)
+      },
+      /**
+       * Conditionals for disabled Parameter menu
+       */
+      showParameterList() {
+        return !!this.parameters['SeasonSelector'].params.season
       },
       filteredResults() {
         const results = {}
@@ -175,45 +284,55 @@
     },
 
     methods: {
-      handleFilterChange(val, filterName) {
-        this.$set(this.filterValues, filterName, val)
+      getParameterParams(name) {
+        const {
+          [name]: {
+            params = {}
+          } = {}
+        } = this.parameters
+
+        return params
       },
-      handleSeasonSelect(val) {
-        this.season = val
-        this.$set(this.filterValues, 'SeasonSelector', val)
+      handleParameterChange(val, parameterName) {
+        this.parameters[parameterName].params = val
       },
       handleClear() {
-        this.addedFilters = []
-
-        const {
-          SeasonSelector,
-        } = this.filterValues
-        this.filterValues = { SeasonSelector }
-      },
-      handleRemoveFilter(filter) {
-        const idx = this.addedFilters.findIndex(f => f === filter)
-        this.addedFilters.splice(idx, 1)
-
-        const {
-          [filter]: type,
-          ...rest
-        } = this.filterValues
-
-        this.filterValues = rest
-      },
-      handleAddFilter(val) {
-        // reset dropdown
-        this.$nextTick(() => {
-          this.addFilter = ''
+        this.addedParameters.slice().forEach(parameterName => {
+          console.log(parameterName)
+          this.handleRemoveParameter(parameterName)
         })
 
-        this.addedFilters.push(val)
+        this.response = ''
+      },
+      handleRemoveParameter(parameterName) {
+        const {
+          [parameterName]: {
+            params = {}
+          } = {}
+        } = this.parameters
+
+        for (const name in params) {
+          params[name] = ''
+        }
+
+        const idx = this.addedParameters.findIndex(f => f === parameterName)
+        console.log(idx)
+        this.addedParameters.splice(idx, 1)
+      },
+      handleAddParameter(val) {
+        if (val === 'SeasonSelector') return
+        // reset dropdown
+        this.$nextTick(() => {
+          this.addParameter = ''
+        })
+
+        this.addedParameters.push(val)
       },
       async handleSearch() {
         try {
           this.error = false
           this.loadingSearch = true
-          const response = await mainSearch(this.getParams)
+          const response = await mainSearch(this.getParamsAsString)
           this.response = response
         } catch (e) {
           this.error = true

@@ -15,7 +15,6 @@
         v-else
         :items="seasons"
         v-model="season"
-        item-text="seasonname"
         label="Please select season"
         hide-details
         single-line
@@ -35,7 +34,7 @@
             full-width>
             <template v-slot:activator="{ on }">
               <v-text-field
-                v-model="startDate"
+                v-model="start_date"
                 label="Start date"
                 append-icon="event"
                 hide-details
@@ -47,9 +46,9 @@
             </template>
             <v-date-picker 
               color="primary"
-              v-model="startDate"
-              :min="startDate"
-              :max="endDate"
+              v-model="start_date"
+              :min="minStartDate"
+              :max="maxEndDate"
               no-title 
               @input="start = false"></v-date-picker>
           </v-menu>
@@ -65,7 +64,7 @@
             full-width>
             <template v-slot:activator="{ on }">
               <v-text-field
-                v-model="endDate"
+                v-model="end_date"
                 label="End date"
                 append-icon="event"
                 hide-details
@@ -77,9 +76,9 @@
             </template>
             <v-date-picker
               color="primary"
-              v-model="endDate"
-              :min="startDate"
-              :max="endDate"
+              v-model="end_date"
+              :min="minStartDate"
+              :max="maxEndDate"
               no-title
               @input="end = false"></v-date-picker>
           </v-menu>
@@ -91,19 +90,22 @@
 
 <script>
   import { seasons } from '@/api'
-  import valueBind from '@/mixins/valueBind'
+  import paramsSync from '@/mixins/paramsSync'
 
   export default {
     name: 'season-selector',
 
-    mixins: [valueBind],
+    mixins: [paramsSync],
 
     watch: {
-      startDate() {
-        this.emitQuery()
+      season() {
+        this.emitUpdate()
       },
-      endDate() {
-        this.emitQuery()
+      start_date() {
+        this.emitUpdate()
+      },
+      end_date() {
+        this.emitUpdate()
       }
     },
 
@@ -112,7 +114,14 @@
 
       seasons()
         .then(results => {
-          this.seasons = results
+          const newResults = results.map(r => {
+            r.text = r.seasonname
+            r.value = r.seasonname.split(' ')[1]
+
+            return r
+          })
+
+          this.seasons = newResults
           this.loading = false
         })
         .catch(e => { 
@@ -122,7 +131,7 @@
     },
 
     props: {
-      disabled: Boolean
+      disabled: Boolean,
     },
 
     data() {
@@ -130,25 +139,29 @@
         loading: false,
         seasons: [],
         season: '',
-        start: false,
-        startDate: '',
-        end: false,
-        endDate: ''
+        minStartDate: '',
+        maxEndDate: '',
+        start: false, // v-menu
+        end: false, // v-menu
+        start_date: '',
+        end_date: '',
+        season: ''
       }
     },
 
     methods: {
       handleSeasonChange(val) {
-        this.startDate = this.seasons.find(s => s.seasonname === val).startdate
-        this.endDate = this.seasons.find(s => s.seasonname === val).enddate
+        const season = this.seasons.find(s => s.seasonname.includes(val))
 
-        this.emitQuery()
+        this.start_date = this.minStartDate = season.startdate
+        this.end_date = this.maxEndDate = season.enddate
       },
-      emitQuery() {
-        const season = this.season.split(' ')[1]
-
-        // this emits 'input' event, see valueBind mixin
-        this.mx_value = `season=${season}&start_date=${this.startDate}&end_date=${this.endDate}`
+      emitUpdate() {
+        this.$emit('update:params-sync', {
+          start_date: this.start_date,
+          end_date: this.end_date,
+          season: this.season
+        })
       }
     }
   }
