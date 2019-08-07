@@ -246,11 +246,11 @@
           return result.concat(value)
         }, [])
       },
+      /**
+       * Loops through this.parameters and extracts this.parameter[name].params
+       * omits any empty values and stringifies it with qs library
+       */
       getParams() {
-        /**
-         * Loops through this.parameters and extracts this.parameter[name].params
-         * omits any empty values and stringifies it with qs library
-         */
         let params = Object.values(this.parameters)
           .reduce((o, v) => {
             const omitEmptyParams = omitBy(v.params, v => v == '')
@@ -332,6 +332,7 @@
         try {
           this.error = false
           this.loadingSearch = true
+          
           const response = await mainSearch(this.getParamsAsString)
           this.response = response
         } catch (e) {
