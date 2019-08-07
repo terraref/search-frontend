@@ -18,7 +18,7 @@
         label="Please select season"
         hide-details
         single-line
-        outline
+        outlined
         class="mb-3"
         :disabled="disabled"
         @change="handleSeasonChange"/>
@@ -28,7 +28,6 @@
           <v-menu
             v-model="start"
             :close-on-content-click="false"
-            lazy
             transition="scale-transition"
             offset-y
             full-width>
@@ -38,7 +37,7 @@
                 label="Start date"
                 append-icon="event"
                 hide-details
-                outline
+                outlined
                 readonly
                 :disabled="!season || disabled"
                 v-on="on"
@@ -58,7 +57,6 @@
           <v-menu
             v-model="end"
             :close-on-content-click="false"
-            lazy
             transition="scale-transition"
             offset-y
             full-width>
@@ -69,7 +67,7 @@
                 append-icon="event"
                 hide-details
                 readonly
-                outline
+                outlined
                 :disabled="!season || disabled"
                 v-on="on"
               ></v-text-field>
@@ -167,4 +165,4 @@
   }
 </script>
 
-<style lang="stylus"></style>
+<style lang="sass"></style>

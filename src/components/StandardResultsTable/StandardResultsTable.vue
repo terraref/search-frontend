@@ -17,10 +17,14 @@
     <v-data-table
       :headers="headers"
       :items="results"
-      :search="search"
-      :rows-per-page-items="[10, 25, 50]"
-    >
-      <template v-slot:items="props">
+      :search="search">
+      <template #item.download="{ item }">
+        <v-btn :href="item.download" target="_blank" class="mr-0" block>Download</v-btn>
+      </template>
+      <template #item.view="{ item }">
+        <v-btn :href="item.view" target="_blank" class="mr-0" block>View</v-btn>
+      </template>
+      <!-- <template v-slot:items="props">
         <td>{{ props.item.name }}</td>
         <td class="text-xs-right">
           <v-btn :href="props.item.download" target="_blank" class="mr-0" block>Download</v-btn>
@@ -28,12 +32,14 @@
         <td class="text-xs-right">
           <v-btn :href="props.item.view" target="_blank" class="mr-0" block>View</v-btn>
         </td>
-      </template>
-      <template v-slot:no-results>
-        <v-alert :value="true" color="error" icon="warning">
+      </template> -->
+      <template #no-results>
+        Your search for "{{ search }}" found no results.
+        <!-- <v-alert :value="true" color="error" icon="warning">
           Your search for "{{ search }}" found no results.
-        </v-alert>
+        </v-alert> -->
       </template>
+      <v-data-footer :items-per-page-options="[10, 25, 50]"></v-data-footer>
     </v-data-table>
   </v-card>
 </template>
@@ -78,7 +84,7 @@
   }
 </script>
 
-<style lang="stylus">
+<style lang="sass">
   .standard-results-table
     .v-card__title
       img

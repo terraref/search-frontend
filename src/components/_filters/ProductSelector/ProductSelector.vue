@@ -14,7 +14,7 @@
         v-model="product"
         single-line
         hide-details
-        outline
+        outlined
         :disabled="disabled"/>
     </v-card-text>
   </v-card>
@@ -74,4 +74,4 @@
   }
 </script>
 
-<style lang="stylus"></style>
+<style lang="sass"></style>

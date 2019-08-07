@@ -1,17 +1,20 @@
 import Vue from 'vue'
-import Vuetify, {} from 'vuetify/lib'
+import Vuetify from 'vuetify/lib'
 
-Vue.use(Vuetify, {
-  components: {},
+Vue.use(Vuetify)
+
+export default new Vuetify({
   theme: {
-    primary: '#116E39',
-    secondary: '#209D79',
-    accent: '#1E528B',
-    'terra-gray': {
-      base: '#49595e',
-      lighten1: '#ededed',
-      darken1: '#403635'
+    themes: {
+      light: {
+        primary: '#209D79',
+        secondary: '#116E39',
+        accent: '#1E528B',
+        common: '#49595e'
+      },
     }
   },
-  iconfont: 'md'
+  icons: {
+    iconfont: 'md', // default - only for display purposes
+  },
 })

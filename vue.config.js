@@ -21,12 +21,11 @@ module.exports = {
   //   }
   // },
 
-  pluginOptions: {
-    'style-resources-loader': {
-      preProcessor: 'stylus',
-      patterns: [
-        path.resolve(__dirname, './src/stylus/variables.styl')
-      ]
+  css: {
+    loaderOptions: {
+      sass: {
+        data: `@import "~@/sass/main.sass"`,
+      }
     }
   }
 }

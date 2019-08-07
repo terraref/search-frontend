@@ -28,4 +28,4 @@
   }
 </script>
 
-<style lang="stylus"></style>
+<style lang="sass"></style>

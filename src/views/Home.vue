@@ -31,12 +31,12 @@
               @update:params-sync="(val) => { handleParameterChange(val, parameterName) }">
             </component>
             <v-btn
-              icon
+              fab
               small
               color="grey"
               class="elevation-1"
               @click="handleRemoveParameter(parameterName)">
-              <v-icon color="white" small>clear</v-icon>
+              <v-icon color="white" small>close</v-icon>
             </v-btn>
           </div>
         </template>
@@ -46,7 +46,7 @@
             <v-select
               v-model="addParameter"
               single-line
-              outline
+              outlined
               append-icon="add"
               label="Add Parameter"
               :items="parameterList"
@@ -55,11 +55,11 @@
           </v-flex>
         </v-layout>
 
-        <v-btn block flat @click="handleClear">Clear Parameters</v-btn>
+        <v-btn block text @click="handleClear">Clear Parameters</v-btn>
         <v-btn 
           block
-          color="secondary"
           dark
+          color="primary"
           large
           :loading="loadingSearch"
           @click="handleSearch">Run Search</v-btn>
@@ -67,11 +67,11 @@
     </v-navigation-drawer>
 
     <v-layout column>
-       <v-flex shrink class="preview-query text-xs-center mb-3">
+       <v-flex shrink class="text-xs-center mb-3">
          <v-card>
-           <v-card-title>
+           <v-card-text>
              <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParamsAsString }}
-           </v-card-title>
+           </v-card-text>
          </v-card>
       </v-flex>
 
@@ -345,7 +345,7 @@
   }
 </script>
 
-<style lang="stylus">
+<style lang="sass">
   .query__wrapper
     max-width: 600px
     margin: 0 auto
@@ -358,9 +358,9 @@
 
     .v-btn
       position: absolute
-      right: -15px
-      top: -15px
-      width: 20px !important
-      height: 20px !important
+      right: -5px
+      top: -5px
+      width: 25px !important
+      height: 25px !important
 </style>
 
