@@ -70,7 +70,7 @@
        <v-flex shrink class="text-xs-center mb-3">
          <v-card>
            <v-card-text>
-             <strong>QUERY: </strong>https://search-api-dev.workbench.terraref.org/search-api/v1/search?{{ getParamsAsString }}
+             <strong>QUERY: </strong>{{ env.VUE_APP_SEARCH_API }}/search?{{ getParamsAsString }}
            </v-card-text>
          </v-card>
       </v-flex>
@@ -189,6 +189,7 @@
         addParameter: '', // v-model for add parameter menu
         addedParameters: [], // parameters added, used for dynamic <component>
         // manifest of available parameters and their properties and params
+        env: process.env,
         parameters: {
           SeasonSelector: {
             text: 'Seasons',

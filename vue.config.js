@@ -3,10 +3,6 @@ var path = require('path')
 module.exports = {
   lintOnSave: false,
 
-  // devServer: {
-  //   host: 'workflows.agbase.arizona.edu'
-  // },
-
   devServer: {
     clientLogLevel: 'info'
   },
