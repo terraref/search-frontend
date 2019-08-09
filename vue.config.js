@@ -3,10 +3,6 @@ var path = require('path')
 module.exports = {
   lintOnSave: false,
 
-  devServer: {
-    clientLogLevel: 'info'
-  },
-
   // pwa: {
   //   name: 'TERRA-REF Advanced Search',
   //   themeColor: '#0E718A',

@@ -1,9 +1,5 @@
 <template>
   <v-card class="pa-1">
-    <!-- <v-card-title primary-title>
-      <h2>Please select season:</h2>
-    </v-card-title> -->
-
     <v-card-text>
       <h3 class="mb-1">Seasons:</h3>
       <v-progress-circular
