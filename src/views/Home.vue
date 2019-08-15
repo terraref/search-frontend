@@ -107,6 +107,8 @@
         <div v-else>Run Search for full results...</div>
       </v-layout>
     </v-layout>
+
+    <div class="app__version grey--text">v{{ APPLICATION_VERSION }}</div>
   </v-container>
 </template>
 
@@ -184,6 +186,7 @@
 
     data() {
       return {
+        APPLICATION_VERSION: APPLICATION_VERSION,
         error: false,
         drawer: true,
         addParameter: '', // v-model for add parameter menu
@@ -348,6 +351,12 @@
 </script>
 
 <style lang="sass">
+  .app__version
+    position: absolute
+    bottom: 5px
+    right: 10px
+    font-size: 12px
+
   .query__wrapper
     max-width: 600px
     margin: 0 auto

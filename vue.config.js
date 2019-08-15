@@ -1,6 +1,17 @@
+var webpack = require('webpack')
 var path = require('path')
 
 module.exports = {
+  configureWebpack: () => {
+    return {
+      plugins: [
+        new webpack.DefinePlugin({
+          'APPLICATION_VERSION': JSON.stringify(require('./package.json').version),
+        })
+      ]
+    }
+  },
+
   lintOnSave: false,
 
   // pwa: {
