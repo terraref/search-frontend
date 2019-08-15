@@ -14,7 +14,8 @@ phases:
       - npm run build:$NODE_ENV
 artifacts:
   files:
-    - dist/**/*
+    - '**/*'
+    base-directory: 'dist*'
   # post_build:
   #   commands:
   #     - aws s3 sync ./dist $S3_BUCKET 
