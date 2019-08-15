@@ -12,6 +12,9 @@ phases:
   build:
     commands:
       - npm run build:$NODE_ENV
-  post_build:
-    commands:
-      - aws s3 sync ./dist $S3_BUCKET 
+artifacts:
+  files:
+    - ./dist
+  # post_build:
+  #   commands:
+  #     - aws s3 sync ./dist $S3_BUCKET 
