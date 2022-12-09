@@ -19,7 +19,7 @@
     "lodash.omitby": "^4.6.0",
     "lodash.reduce": "^4.6.0",
     "lodash.uniq": "^4.5.0",
-    "qs": "^6.7.0",
+    "qs": "^6.7.3",
     "register-service-worker": "^1.6.2",
     "vue": "~2.6.10",
     "vue-router": "~3.0.3",
